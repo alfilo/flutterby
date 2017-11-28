@@ -42,20 +42,20 @@ body {
     color: black;
 }
 
-/* Create three unequal columns that floats next to each other */
+/* Create two unequal columns that float next to each other */
 .column {
     float: left;
     padding: 10px;
 }
 
-/* Left and right column */
-.column.side {
+/* Right column */
+.column.right {
     width: 25%;
 }
 
-/* Middle column */
-.column.middle {
-    width: 50%;
+/* Main column */
+.column.main {
+    width: 75%;
 }
 
 /* Clear floats after the columns */
@@ -67,7 +67,7 @@ body {
 
 /* Responsive layout - makes the three columns stack on top of each other instead of next to each other */
 @media (max-width: 600px) {
-    .column.side, .column.middle {
+    .column.right, .column.main {
         width: 100%;
     }
 }
@@ -94,17 +94,13 @@ body {
 </div>
 
 <div class="row">
-  <div class="column side">
-    <h2>Side</h2>
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit..</p>
-  </div>
-  <div class="column middle">
+  <div class="column main">
     <h2>Main Content</h2>
     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas sit amet pretium urna. Vivamus venenatis velit nec neque ultricies, eget elementum magna tristique. Quisque vehicula, risus eget aliquam placerat, purus leo tincidunt eros, eget luctus quam orci in velit. Praesent scelerisque tortor sed accumsan convallis.</p>
     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas sit amet pretium urna. Vivamus venenatis velit nec neque ultricies, eget elementum magna tristique. Quisque vehicula, risus eget aliquam placerat, purus leo tincidunt eros, eget luctus quam orci in velit. Praesent scelerisque tortor sed accumsan convallis.</p>
   </div>
-  <div class="column side">
-    <h2>Side</h2>
+  <div class="column right">
+    <h2>Right Side</h2>
     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit..</p>
   </div>
 </div>
