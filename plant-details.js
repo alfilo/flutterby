@@ -44,10 +44,12 @@ function customizePage(data) {
     // Fill in the table
     var $tbody = $(".main tbody");
     for (var prop in plantInfo) {
-        $("<tr>")
-            .append($("<td>").text(prop))
-            .append($("<td>").text(plantInfo[prop]))
-            .appendTo($tbody);
+        if (plantInfo[prop]) {  // Skip over features w/o details
+            $("<tr>")
+                .append($("<td>").text(prop))
+                .append($("<td>").text(plantInfo[prop]))
+                .appendTo($tbody);
+        }
     }
 
     // Update the plant image(s)
