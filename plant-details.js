@@ -1,19 +1,3 @@
-function handleFileSelect(evt) {
-    var file = evt.target.files[0];
-
-    Papa.parse(file, {
-        delimiter: '|',
-        header: true,
-        //dynamicTyping: true,
-        skipEmptyLines: true,
-        complete: function(results) {
-            console.log("CSV-file parse results:");
-            console.log(results);
-            customizePage(results.data)
-        }
-    });
-}
-
 // Convert scientific name to ID; e.g.:
 //   "Penstemon digitalis 'Mystica'" --> "penstemon-digitalis-mystica"
 // Ignore extra descriptors in image titles:
@@ -81,6 +65,16 @@ function customizePage(data) {
 }
 
 $(function() {  // Call this from DOM's .ready()
-    // Read in the CSV file on change to file-input value
-    $("#csv-file").change(handleFileSelect);
+    Papa.parse('plants.csv', {
+        download: true,
+        delimiter: '|',
+        header: true,
+        //dynamicTyping: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+            console.log("CSV-file parse results:");
+            console.log(results);
+            customizePage(results.data)
+        }
+    });
 });
