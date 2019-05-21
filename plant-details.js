@@ -68,9 +68,10 @@ function customizePage(data) {
     }
 }
 
-$(function() {  // Call this from DOM's .ready()
-    Papa.parse('plants.csv', {
-        download: true,
+// If text is defined, we're running locally
+function handleCSV(text) {
+    Papa.parse(text || "plants.csv", {
+        download: !text,
         delimiter: '|',
         header: true,
         //dynamicTyping: true,
@@ -81,4 +82,16 @@ $(function() {  // Call this from DOM's .ready()
             customizePage(results.data)
         }
     });
+}
+
+$(function() {  // Call this from DOM's .ready()
+    const LOCAL_DOMAINS = ["localhost", "127.0.0.1", ""];
+    var local = LOCAL_DOMAINS.includes(location.hostname);
+    if (local) {
+        // Get the contents of (local) plants.csv and call
+        // handleCSV with the text of the file as argument
+        $.get("plants.csv", handleCSV);
+    } else {
+        handleCSV();  // No argument (text is undefined)
+    }
 });
