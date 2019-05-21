@@ -31,7 +31,8 @@ function customizePage(data) {
     // Save non-standard image titles, make the full name of the plant, and delete values
     // that aren't used in the feature table
     var sciName = plantInfo["Scientific Name"];
-    var fullName = sciName + " (" + plantInfo["Common Name"] + ")";
+    var comName = plantInfo["Common Name"];
+    var fullName = sciName + (comName ? " (" + plantInfo["Common Name"] + ")" : "");
     var titles = plantInfo["Image Titles"];
     var imgTitles = titles ? titles.split(':') : [ sciName ];
     delete plantInfo["Scientific Name"];
@@ -61,6 +62,7 @@ function customizePage(data) {
             .attr("src", "images/" + id + ".jpg")
             .attr("title", title)
             .attr("alt", title)
+            .attr("onerror", "this.src='butterflies.jpg'")
             .css({'width' : '100%', 'margin-left' : '15px'})
             .appendTo($rdiv);
     }
