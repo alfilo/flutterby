@@ -1,4 +1,7 @@
 # -*- mode: gitignore; -*-
+.DS_Store
+Icon*
+
 *~
 \#*\#
 /.emacs.desktop
@@ -14,3 +17,9 @@ tramp
 
 # directory configuration
 .dir-locals.el
+
+# Temp files
+util/bak
+util/*.txt
+util/*.html
+util/*.csv
