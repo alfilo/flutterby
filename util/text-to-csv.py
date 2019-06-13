@@ -43,13 +43,19 @@ def plant_names(full_name):
     return (scientific_name, common_name, plant_id)
 
 def process_input_files(input_files, csv_file, ahref_file, verbose=False):
+    features = ["Type", "Zone", "When it Blooms", "Where to Grow",
+                "Soil Type", "When to Divide", "Habit", "Scent",
+                "Attracts", "Resist", "Maturity Rate", "Long Lived",
+                "Something Special or Unique"]
+
     csvf = open(csv_file, 'w') if csv_file else sys.stdout
     ahrf = open(ahref_file, 'w') if ahref_file else sys.stdout
 
     for input_file in input_files:
         if verbose:
-            print("Processing " + input_file)
-        details = []
+            print("\nProcessing " + input_file)
+        specs = {}
+        img_names = []
         with open(input_file) as f:
             lines = f.readlines()
             lines = [x.strip() for x in lines]
@@ -64,10 +70,33 @@ def process_input_files(input_files, csv_file, ahref_file, verbose=False):
             for line in lines[1:]:
                 if not line.strip(): continue
                 record = line.split(': ', 1)
-                details.append(record[1] if len(record) > 1 else '')
-                if record[0] == "Attracts":
-                    details.append('')  # An extra entry for "Resists"
-        csvf.write('|'.join(details) + '|\n')
+                if len(record) > 1:
+                    feature = record[0]
+                    if not feature in features:
+                        sys.stderr.write('Skipping unrecognized feature %s\n' % feature)
+                    else:
+                        specs[feature] = record[1].strip()
+                    continue
+
+                # Only one entry: missing detail for feature or image name
+                if features[-1] in specs:
+                    # Extra info after the last feature; assume image name
+                    # Check if the text starts as does sci_name (only checking
+                    # the first word for cases like "Sedum varieties")
+                    contains_sci_name = record[0].split()[0] == sci_name.split()[0]
+                    img_name = (record[0] if contains_sci_name
+                                else sci_name + " '" + record[0] + "'")
+                    img_names.append(img_name)
+                    if verbose:
+                        print('Treating "%s" as image info' % record[0])
+                        if img_name != record[0]:
+                            print('Full image name: "%s"' % img_name)
+                else:
+                    sys.stderr.write('Missing detail for feature %s\n' % record[0])
+                    specs[record[0]] = ''
+
+        details = [specs.get(f, '') for f in features]
+        csvf.write('|'.join(details) + '|' + ':'.join(img_names) + '\n')
 
     if csv_file: csvf.close()
     if ahref_file: ahrf.close()
@@ -87,7 +116,8 @@ def main(argv=None):
                         help="output file for html links (default: stdout)")
     args = parser.parse_args()
 
-    print("Running with settings: %s...\n" % args)
+    if args.verbose:
+        print("Running with settings: %s...\n" % args)
 
     process_input_files(args.files, args.csv, args.ahref, args.verbose)
 
