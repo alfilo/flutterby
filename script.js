@@ -13,7 +13,7 @@ function makeId(scientificName) {
 }
 
 // Customize the page for the requested plant
-function customizePage(data) {
+function customizePlantDetailsPage(data) {
     // Find the entry for the requested plant (name search param)
     var urlParams = new URLSearchParams(location.search);
     var requestedPlantName = urlParams.get("name");
@@ -68,6 +68,39 @@ function customizePage(data) {
     }
 }
 
+function configureAutocomplete(data) {
+    $("#psearch").autocomplete({
+        source: function(request, response) {
+            var matcher = new RegExp($.ui.autocomplete.escapeRegex(request.term), "i");
+            response($.grep(data, function(item) {
+                return matcher.test(item["Scientific Name"])
+                    || matcher.test(item["Common Name"]);
+            }));
+        },
+        minLength: 0,
+        select: function(event, ui) {
+            var plantId = makeId(ui.item["Scientific Name"]);
+
+            // In bigger projects, it's safer to use window.location,
+            // because location might be redefined.
+            // Setting location and location.href has the same effect, if
+            // location isn't set.  Both act as if the link is clicked, so
+            // "Back" goes to current page).  location.replace(url) is like
+            // HTTP redirect--it skips the current page for back navigation.
+            // $(location).attr('href', url) is the jQuery way but it's not
+            // an improvement over the below.
+
+            // Navigate to the selected plant
+            location.href = "plant-details.html?name=" + plantId;
+        }
+    }).autocomplete( "instance" )._renderItem = function(ul, item) {
+        return $("<li>")
+            .append("<div><i>" + item["Scientific Name"] + "</i> (" +
+                    item["Common Name"] + ")</div>")
+            .appendTo(ul);
+    };
+}
+
 // If text is defined, we're running locally
 function handleCSV(text) {
     Papa.parse(text || "plants.csv", {
@@ -79,7 +112,16 @@ function handleCSV(text) {
         complete: function(results) {
             console.log("CSV-file parse results:");
             console.log(results);
-            customizePage(results.data)
+
+            // If the location includes a search entry, we're customizing the
+            // plant details page for the requested plant; otherwise, we're
+            // setting up the plant search (using autocomplete) on the
+            // top-level page (index.html).
+            if (location.search) {
+                customizePlantDetailsPage(results.data);
+            } else {
+                configureAutocomplete(results.data);
+            }
         }
     });
 }

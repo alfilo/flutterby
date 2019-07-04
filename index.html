@@ -5,6 +5,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" type="text/css" href="style.css">
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.6.3/papaparse.min.js"></script>
+<script src="script.js"></script>
 </head>
 <body>
 
@@ -52,6 +57,16 @@
     <p><a href="contact.html">Contact Me</a></p>
   </div>
   <div class="column right">
+
+    <h2>Search Plants by Name</h2>
+    <p>On a computer, press up or down arrow keys while inside the
+    search box to display the full plant list sorted by scientific
+    name and grouped by year (current year's plants will appear
+    first).</p>
+
+    <label for="psearch">Search: </label>
+    <input id="psearch">
+
     <h2>Plant List 2019 (alphabetical)</h2>
 
     <ul>
