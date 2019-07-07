@@ -127,6 +127,19 @@ function handleCSV(text) {
 }
 
 $(function() {  // Call this from DOM's .ready()
+    // Define header, topnav, and footer in one place (load.html) and
+    // reuse them for every page (for consistency and easier updates)
+    var sharedElts = ["#header", "#topnav", "#footer"];
+    for (var i = 0; i < sharedElts.length; i++) {
+        // First use of sharedElts[i] refers to placeholders on this page
+        // Second use (after load.html) refers to elements of load.html
+        // Reusing the names doesn't appear to create conflicts
+        $(sharedElts[i]).load("load.html " + sharedElts[i]);
+    }
+
+    // The contact page doesn't use CSV info
+    if (location.pathname.includes("contact.html")) return;
+
     const LOCAL_DOMAINS = ["localhost", "127.0.0.1", ""];
     var local = LOCAL_DOMAINS.includes(location.hostname);
     if (local) {
