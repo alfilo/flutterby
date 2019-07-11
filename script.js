@@ -40,7 +40,7 @@ function customizePlantDetailsPage(data) {
     delete plantInfo["Image Titles"];
 
     // Update heading
-    $(".header h1").text(fullName);
+    $("#header h1").text(fullName);
 
     // Fill in the table
     var $tbody = $(".main tbody");
@@ -126,20 +126,7 @@ function handleCSV(text) {
     });
 }
 
-$(function() {  // Call this from DOM's .ready()
-    // Define header, topnav, and footer in one place (load.html) and
-    // reuse them for every page (for consistency and easier updates)
-    var sharedElts = ["#header", "#topnav", "#footer"];
-    for (var i = 0; i < sharedElts.length; i++) {
-        // First use of sharedElts[i] refers to placeholders on this page
-        // Second use (after load.html) refers to elements of load.html
-        // Reusing the names doesn't appear to create conflicts
-        $(sharedElts[i]).load("load.html " + sharedElts[i]);
-    }
-
-    // The contact page doesn't use CSV info
-    if (location.pathname.includes("contact.html")) return;
-
+function customize() {
     const LOCAL_DOMAINS = ["localhost", "127.0.0.1", ""];
     var local = LOCAL_DOMAINS.includes(location.hostname);
     if (local) {
@@ -148,5 +135,25 @@ $(function() {  // Call this from DOM's .ready()
         $.get("plants.csv", handleCSV);
     } else {
         handleCSV();  // No argument (text is undefined)
+    }
+}
+
+$(function() {  // Call this from DOM's .ready()
+    // Define header, topnav, and footer in one place (load.html) and
+    // reuse them for every page (for consistency and easier updates)
+    var sharedElts = ["#header", "#topnav", "#footer"];
+
+    for (var i = 0; i < sharedElts.length; i++) {
+        // The contact page doesn't use CSV info; for others, call
+        // customize after the header load is completed because
+        // the header is the only loaded element that may be updated
+        if (i == 0 && !location.pathname.includes("contact.html")) {
+            // First use of sharedElts[i] refers to placeholders on the page
+            // Second use (after load.html) refers to elements of load.html
+            // Reusing the names doesn't appear to create conflicts
+            $(sharedElts[i]).load("load.html " + sharedElts[i], customize);
+        } else {
+            $(sharedElts[i]).load("load.html " + sharedElts[i]);
+        }
     }
 });
