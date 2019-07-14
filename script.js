@@ -71,10 +71,13 @@ function customizePlantDetailsPage(data) {
 function configureAutocomplete(data) {
     $("#psearch").autocomplete({
         source: function(request, response) {
+            var year = $("#psearch-year").val();
             var matcher = new RegExp($.ui.autocomplete.escapeRegex(request.term), "i");
             response($.grep(data, function(item) {
-                return matcher.test(item["Scientific Name"])
-                    || matcher.test(item["Common Name"]);
+                // Filter by the selected year
+                return item["Year(s) Sold"].includes(year)
+                    && (matcher.test(item["Scientific Name"])
+                        || matcher.test(item["Common Name"]));
             }));
         },
         minLength: 0,
