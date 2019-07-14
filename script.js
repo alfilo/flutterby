@@ -6,7 +6,7 @@
 function makeId(scientificName) {
     var res = scientificName.toLowerCase()
         .split(';', 1)[0]  // Take only the part before ';', if present
-        .replace(/[^a-z ]+/g, '')  // Delete non-alpha, non-space chars
+        .replace(/[^a-z0-9 ]+/g, '')  // Keep alphanumeric chars and spaces
         .replace(/ /g, '-');  // Replace spaces with dashes
     console.log("ID for '" + scientificName + "': " + res);
     return res;
