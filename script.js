@@ -144,19 +144,18 @@ function customize() {
 $(function() {  // Call this from DOM's .ready()
     // Define header, topnav, and footer in one place (load.html) and
     // reuse them for every page (for consistency and easier updates)
-    var sharedElts = ["#header", "#topnav", "#footer"];
+    var placeholders = ["#header", "#topnav", "#footer"];
 
-    for (var i = 0; i < sharedElts.length; i++) {
-        // The contact page doesn't use CSV info; for others, call
-        // customize after the header load is completed because
+    // Replace placeholders with matching shared elements in load.html
+    for (var i = 0; i < placeholders.length; i++) {
+        var sharedEltUrl = "load.html " + placeholders[i] + "-shared";
+        // Call customize for plant pages (plants.html & plant-details.html).
+        // Do this after the header load is completed because
         // the header is the only loaded element that may be updated
-        if (i == 0 && !location.pathname.includes("contact.html")) {
-            // First use of sharedElts[i] refers to placeholders on the page
-            // Second use (after load.html) refers to elements of load.html
-            // Reusing the names doesn't appear to create conflicts
-            $(sharedElts[i]).load("load.html " + sharedElts[i], customize);
+        if (i == 0 && location.pathname.includes("plant")) {
+            $(placeholders[i]).load(sharedEltUrl, customize);
         } else {
-            $(sharedElts[i]).load("load.html " + sharedElts[i]);
+            $(placeholders[i]).load(sharedEltUrl);
         }
     }
 });
