@@ -104,6 +104,9 @@ function configureAutocomplete(data) {
     };
 }
 
+// The data from the CSV file
+var plantData;
+
 // If text is defined, we're running locally
 function handleCSV(text) {
     Papa.parse(text || "plants.csv", {
@@ -115,6 +118,9 @@ function handleCSV(text) {
         complete: function(results) {
             console.log("CSV-file parse results:");
             console.log(results);
+
+            // Save the CSV data in a global for filtering
+            plantData = results.data;
 
             // If the location includes a search entry, we're customizing the
             // plant details page for the requested plant; otherwise, we're
@@ -141,6 +147,56 @@ function customize() {
     }
 }
 
+// Tracks the current filter selections {feature: detail, ...}
+var curFilters = {};
+
+function updateFilter() {
+    // Get the value for filter (in this node) and the filter
+    // (in grandparent's first element child)
+    var value = this.textContent.toLowerCase();
+    var filterBtn = this.parentNode.parentNode.firstElementChild;
+    var filter = filterBtn.textContent;
+
+    // Clear selected style in buttons of this filter's dropdown-content
+    // (in case there was a selection in this filter before)
+    $(this.parentNode).find(".selected").removeClass("selected");
+
+    if (curFilters[filter] === value) {
+        // Same setting for filter clicked: delete from current
+        // filters and clear selected style for filter button
+        delete curFilters[filter];
+        $(filterBtn).removeClass("selected");
+    } else {
+        // New or different setting for filter: update current filters
+        // and add selected style to the filter and value buttons
+        curFilters[filter] = value;
+        $(this).addClass("selected");
+        $(filterBtn).addClass("selected");
+    }
+
+    // Recompute the array of plants matching the filters from scratch
+    var filterPlants = $.grep(plantData, function(item) {
+        // Check item's entries against every filter's selection
+        for (var filter in curFilters) {
+            // Values in curFilters are lowercase
+            if (!item[filter].toLowerCase().includes(curFilters[filter]))
+                return false;  // Any match fails: skip item (plant)
+        }
+        return true;  // Passed all filters: keep item (plant)
+    });
+
+    // Re-populate the results list with links to plant-detail pages
+    var $frUl = $("#filter-results").empty();
+    for (var i = 0; i < filterPlants.length; i++) {
+        var sciName = filterPlants[i]["Scientific Name"];
+        var comName = filterPlants[i]["Common Name"];
+        var href = "plant-details.html?name=" + makeId(sciName);
+        var $a = $("<a>").attr("href", href)
+            .text(sciName + " (" + comName + ")");
+        $("<li>").append($a).appendTo($frUl);
+    }
+}
+
 $(function() {  // Call this from DOM's .ready()
     // Define header, topnav, and footer in one place (load.html) and
     // reuse them for every page (for consistency and easier updates)
@@ -158,4 +214,7 @@ $(function() {  // Call this from DOM's .ready()
             $(placeholders[i]).load(sharedEltUrl);
         }
     }
+
+    // Register on-click listener for filter selections
+    $("#filter-group .dropdown-content button").click(updateFilter);
 });
