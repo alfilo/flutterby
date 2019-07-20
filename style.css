@@ -175,7 +175,7 @@ th, td {
     clear: both;
 }
 
-/* Responsive layout for narrow screens */,
+/* Responsive layout for narrow screens */
 @media (max-width: 600px) {
     /* Stack the two columns */
     .column.right, .column.main {
