@@ -12,6 +12,10 @@ function makeId(scientificName) {
     return res;
 }
 
+function fullName(scientificName, commonName) {
+    return scientificName + (commonName ? " (" + commonName + ")" : "");
+}
+
 // Customize the page for the requested plant
 function customizePlantDetailsPage(data) {
     // Find the entry for the requested plant (name search param)
@@ -32,7 +36,6 @@ function customizePlantDetailsPage(data) {
     // that aren't used in the feature table
     var sciName = plantInfo["Scientific Name"];
     var comName = plantInfo["Common Name"];
-    var fullName = sciName + (comName ? " (" + plantInfo["Common Name"] + ")" : "");
     var titles = plantInfo["Image Titles"];
     var imgTitles = titles ? titles.split(':') : [ sciName ];
     delete plantInfo["Scientific Name"];
@@ -40,7 +43,7 @@ function customizePlantDetailsPage(data) {
     delete plantInfo["Image Titles"];
 
     // Update heading
-    $("#header h1").text(fullName);
+    $("#header h1").text(fullName(sciName, comName));
 
     // Fill in the table
     var $tbody = $(".main tbody");
@@ -97,9 +100,11 @@ function configureAutocomplete(data) {
             location.href = "plant-details.html?name=" + plantId;
         }
     }).autocomplete( "instance" )._renderItem = function(ul, item) {
+        var sciName = item["Scientific Name"];
+        var comNameStr = item["Common Name"] ?
+            " (" + item["Common Name"] + ")" : "";
         return $("<li>")
-            .append("<div><i>" + item["Scientific Name"] + "</i> (" +
-                    item["Common Name"] + ")</div>")
+            .append("<div><i>" + sciName + "</i>" + comNameStr + "</div>")
             .appendTo(ul);
     };
 }
@@ -191,8 +196,7 @@ function updateFilter() {
         var sciName = filterPlants[i]["Scientific Name"];
         var comName = filterPlants[i]["Common Name"];
         var href = "plant-details.html?name=" + makeId(sciName);
-        var $a = $("<a>").attr("href", href)
-            .text(sciName + " (" + comName + ")");
+        var $a = $("<a>").attr("href", href).text(fullName(sciName, comName));
         $("<li>").append($a).appendTo($frUl);
     }
 }
