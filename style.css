@@ -28,6 +28,18 @@ th, td {
 /* Style the header */
 #header {
     background-color: #f1f1f1;
+    /* Can't set the opacity of a background.  Workaround: start with another
+       "image": a gradient from white to white with opacity 0.4.
+       For wide-enough screens, let the real image cover part of the screen
+       and repeat left-to-right.  See the bottom for updated background-size
+       for narrow screens.
+   */
+    background-image: linear-gradient(rgba(255,255,255,.4), rgba(255,255,255,.4)),
+                      url(images/gaillardia-grandiflora.jpg);
+    background-repeat: no-repeat, repeat-x;
+    background-size: cover, 60%;
+    background-position: center;
+
     padding: 20px;
     text-align: center;
 }
@@ -150,5 +162,8 @@ th, td {
 @media (max-width: 600px) {
     .column.right, .column.main {
         width: 100%;
+    }
+    #header {
+        background-size: cover;
     }
 }
