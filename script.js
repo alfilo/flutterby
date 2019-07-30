@@ -183,8 +183,22 @@ function updateFilter() {
     var filterPlants = $.grep(plantData, function(item) {
         // Check item's entries against every filter's selection
         for (var filter in curFilters) {
-            // Values in curFilters are lowercase
-            if (!item[filter].toLowerCase().includes(curFilters[filter]))
+            if (filter === "Zone") {
+                // Split the plant's zone range on non-digits and drop
+                // non-numbers, in case of comments at the end
+                var zoneRange = item[filter].split(/\D+/).filter(Number);
+                // Exclude plants without Zone numbers
+                if (zoneRange.length == 0) return false;
+
+                // Multiply by 1 to convert strings to numbers
+                var zoneMin = zoneRange[0] * 1;
+                var zoneMax = zoneRange[zoneRange.length - 1] * 1;
+                var selectedZone = curFilters[filter] * 1;
+                if (selectedZone < zoneMin || selectedZone > zoneMax)
+                    return false;  // Out of range, not a match
+
+            } else if (!item[filter].toLowerCase().includes(curFilters[filter]))
+                // Values in curFilters are lowercase
                 return false;  // Any match fails: skip item (plant)
         }
         return true;  // Passed all filters: keep item (plant)
