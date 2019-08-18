@@ -62,10 +62,10 @@ function customizePlantDetailsPage(data) {
         var title = imgTitles[i];
         var id = makeId(title);
         $("<img>")
-            .attr("src", "images/" + id + ".jpg")
-            .attr("title", title)
-            .attr("alt", title)
-            .attr("onerror", "this.src='butterflies.jpg'")
+            .prop("src", "images/" + id + ".jpg")
+            .prop("title", title)
+            .prop("alt", title)
+            .prop("onerror", "this.src='butterflies.jpg'")
             .css({'width' : '100%', 'margin-left' : '15px'})
             .appendTo($rdiv);
     }
@@ -93,7 +93,7 @@ function configureAutocomplete(data) {
             // location isn't set.  Both act as if the link is clicked, so
             // "Back" goes to current page).  location.replace(url) is like
             // HTTP redirect--it skips the current page for back navigation.
-            // $(location).attr('href', url) is the jQuery way but it's not
+            // $(location).prop('href', url) is the jQuery way but it's not
             // an improvement over the below.
 
             // Navigate to the selected plant
@@ -142,7 +142,7 @@ function handleCSV(text) {
 
 function customize() {
     const LOCAL_DOMAINS = ["localhost", "127.0.0.1", ""];
-    var local = LOCAL_DOMAINS.includes(location.hostname);
+    var local = LOCAL_DOMAINS.indexOf(location.hostname) >= 0;
     if (local) {
         // Get the contents of (local) plants.csv and call
         // handleCSV with the text of the file as argument
@@ -210,7 +210,7 @@ function updateFilter() {
         var sciName = filterPlants[i]["Scientific Name"];
         var comName = filterPlants[i]["Common Name"];
         var href = "plant-details.html?name=" + makeId(sciName);
-        var $a = $("<a>").attr("href", href).text(fullName(sciName, comName));
+        var $a = $("<a>").prop("href", href).text(fullName(sciName, comName));
         $("<li>").append($a).appendTo($frUl);
     }
 }
