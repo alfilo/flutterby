@@ -52,7 +52,7 @@ th, td {
 }
 
 
-/* === TOP NAVIGATION === */
+/* === TOP NAVIGATION & FILTERS === */
 
 /* Style the top navigation bar */
 #topnav {
@@ -70,9 +70,11 @@ th, td {
 
 #filter-group button {
     display: inline-block;
+    background-color: #c0c0c0;  /* Use Safari's buttonface color */
     text-align: center;
     padding: 14px 16px;
     border: none;
+    margin: 2px 2px;  /* Make explicit Safari's default behavior */
     font-weight: bold;
 }
 
