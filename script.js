@@ -155,6 +155,14 @@ function customize() {
 // Tracks the current filter selections {feature: detail, ...}
 var curFilters = {};
 
+function clearFilters() {
+    curFilters = {};  // Remove all filter settings
+    // Clear selected style for all filter buttons
+    $("#filter-group").find(".selected").removeClass("selected");
+    $("#filter-results").empty();  // Empty the list of matching plants
+    $(this).hide();  // Hide the clear-all-filters button
+}
+
 function updateFilter() {
     // Get the value for filter (in this node) and the filter
     // (in grandparent's first element child)
@@ -178,6 +186,18 @@ function updateFilter() {
         $(this).addClass("selected");
         $(filterBtn).addClass("selected");
     }
+
+    // Empty the list of matching list
+    var $frUl = $("#filter-results").empty();
+
+    // If no filter is set, hide the clear-all-filters button and return
+    if ($.isEmptyObject(curFilters)) {
+        $("#clear-filters").hide();
+        return;
+    }
+
+    // At least one filter is set, show the clear-all-filters button
+    $("#clear-filters").show();
 
     // Recompute the array of plants matching the filters from scratch
     var filterPlants = $.grep(plantData, function(item) {
@@ -204,8 +224,7 @@ function updateFilter() {
         return true;  // Passed all filters: keep item (plant)
     });
 
-    // Re-populate the results list with links to plant-detail pages
-    var $frUl = $("#filter-results").empty();
+    // Populate the results list with links to plant-detail pages
     for (var i = 0; i < filterPlants.length; i++) {
         var sciName = filterPlants[i]["Scientific Name"];
         var comName = filterPlants[i]["Common Name"];
@@ -235,4 +254,8 @@ $(function() {  // Call this from DOM's .ready()
 
     // Register on-click listener for filter selections
     $("#filter-group .dropdown-content button").click(updateFilter);
+
+    // Register on-click listener for clear-all-filters and hide the button
+    var $cf = $("#clear-filters").click(clearFilters);
+    $cf.hide();
 });

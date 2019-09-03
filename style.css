@@ -68,12 +68,13 @@ th, td {
     text-decoration: none;
 }
 
-#filter-group button {
+#filter-group button, #clear-filters {
     display: inline-block;
     background-color: #c0c0c0;  /* Use Safari's buttonface color */
     text-align: center;
     padding: 14px 16px;
     border: none;
+    border-radius: 4px;
     margin: 2px 2px;  /* Make explicit Safari's default behavior */
     font-weight: bold;
 }
@@ -130,6 +131,11 @@ th, td {
     color: blue;
     font-style: italic;
     text-decoration: underline;
+}
+
+/* Style the clear-all-filters button */
+#clear-filters {
+    padding: 6px 10px;
 }
 
 /* === MAIN CONTENT === */
