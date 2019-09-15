@@ -65,7 +65,7 @@ function customizePlantDetailsPage(data) {
             .prop("src", "images/" + id + ".jpg")
             .prop("title", title)
             .prop("alt", title)
-            .prop("onerror", "this.src='butterflies.jpg'")
+            .attr("onerror", "this.src='butterflies.jpg'")
             .css({'width' : '100%', 'margin-left' : '15px'})
             .appendTo($rdiv);
     }
