@@ -156,6 +156,11 @@ th, td {
     width: 65%;
 }
 
+.news {
+    color: rgb(244, 0, 0);
+    font-weight: bold;
+}
+
 
 /* === CONTACT FORM === */
 
