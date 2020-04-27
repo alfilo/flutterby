@@ -170,32 +170,78 @@ th, td {
     font-weight: bold;
 }
 
+/* === FORMS & SEARCH === */
 
-/* === CONTACT FORM === */
+/* Common settings for most form elements */
+input, select, textarea {
+    width: 50%;
+    margin: 5px 10px 10px 0;
+    border: 4px solid #aaa;
+    border-radius: 6px;
+    background-color: #f2f2f2;
 
-/* Form container */
-.form-cont {
-    position: relative;
-    overflow: hidden;
-    padding-top: 56.25%;
+    -webkit-transition: border-color 0.5s, background-color 0.5s;
+    transition: border-color 0.5s, background-color 0.5s;
 }
 
-/* Form */
-.form {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border: 0;
+/* Override or refine settings for some form elements */
+
+/* These also override the responsive section's "input" */
+input[type=submit], input[type=checkbox], select {
+    width: initial;
+}
+
+/* Make the button stand out a bit */
+input[type=submit] {
+    font-weight: bold;
+}
+
+/* Use different padding in the two columns' inputs */
+.column.main input, textarea {
+    padding: 10px 15px;
+}
+
+.column.right input {
+    padding: 3px 5px;
+}
+
+textarea {
+    resize: none;
+}
+
+/* Make placeholder text gray, bold, italic */
+::placeholder {  /* Chrome, Firefox, Opera, Safari 10.1+ */
+    font-style: italic;
+    font-weight: bold;
+    color: #aaa;
+    opacity: 1;  /* Firefox */
+}
+  
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+    font-style: italic;
+    font-weight: bold;
+    color: #aaa;
+}
+  
+::-ms-input-placeholder { /* Microsoft Edge */
+    font-style: italic;
+    font-weight: bold;
+    color: #aaa;
+}
+
+/* Bring attention to elements in focus */
+input:focus, select:focus, textarea:focus {
+    border-color: #777;
+    background-color: #fff;
+    outline: none;  /* Remove the default focus effect */
 }
 
 /* === RESPONSIVE LAYOUT === */
 
 /* Responsive layout for narrow screens */
-@media (max-width: 600px) {
-    /* Stack the two columns */
-    .column.right, .column.main {
+@media only screen and (max-width: 600px) {
+    /* Stack the two columns; make form inputs full width */
+    .column.right, .column.main, input, textarea {
         width: 100%;
     }
     /* Make background image fill #header */
