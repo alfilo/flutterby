@@ -209,6 +209,12 @@ textarea {
     resize: none;
 }
 
+/* Style for more important labels.  Using headings inside labels
+    interferes with assistive devices. */
+.big-label {
+    font-weight: bold;
+}
+
 /* Make placeholder text gray, bold, italic */
 ::placeholder {  /* Chrome, Firefox, Opera, Safari 10.1+ */
     font-style: italic;

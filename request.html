@@ -23,10 +23,15 @@
 <div class="row">
   <div class="column main">
     <h2>Plant Request Form</h2>
+    <p>Please provide your name, email address and the list of plants
+      that you would like to purchase.  We will confirm availability
+      and other logistics over email shortly.</p>
     <form action="https://docs.google.com/forms/d/e/1FAIpQLSf6WAe6chtpjZJgsSInVpXQNpB5lPcIEWWKOr09WDychNthuA/formResponse" method="post">
       <input type="text" id="name" name="entry.1608627400" placeholder="Your Name" required/><br>
       <input type="email" id="email" name="entry.1034399466" placeholder="Email Address" required/><br><br>
-      <label for="plants">Plant Names and Quantities</label><br>
+      <label for="plants" class="big-label">Plant Names and Quantities</label><br>
+      <p>Perennials: $3, Herbs: $2, Hosta & Astilbe: $5<br>
+        Delivery:  $3, free with purchases of over $25</p>
       <textarea id="plants" name="entry.972583497" placeholder="Ex: Sage: 6, Vernonia: 5, ..." required maxlength="500" rows="10"></textarea><br><br>
       <input type="submit" value="Send"/>
     </form>
