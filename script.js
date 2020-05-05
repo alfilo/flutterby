@@ -258,4 +258,8 @@ $(function() {  // Call this from DOM's .ready()
     // Register on-click listener for clear-all-filters and hide the button
     var $cf = $("#clear-filters").click(clearFilters);
     $cf.hide();
+
+    // Click on the current year (first button under dropdown-content of the
+    // last div (a dropdown) under filter-group).
+    $("#filter-group div:last-child .dropdown-content button:first-child").click();
 });
