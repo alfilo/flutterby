@@ -129,11 +129,22 @@ function handleCSV(text) {
 
             // If the location includes a search entry, we're customizing the
             // plant details page for the requested plant; otherwise, we're
-            // setting up the plant search (using autocomplete) on the
-            // top-level page (index.html).
+            // setting up the top-level page (plants.html).
             if (location.search) {
                 customizePlantDetailsPage(results.data);
             } else {
+                // Register on-click listener for filter selections
+                $("#filter-group .dropdown-content button").click(updateFilter);
+
+                // Register on-click listener for clear-all-filters and hide the button
+                var $cf = $("#clear-filters").click(clearFilters);
+                $cf.hide();
+
+                // Click on the current year (first button under dropdown-content
+                // of the last div (a dropdown) under filter-group)
+                $("#filter-group div:last-child .dropdown-content button:first-child").click();
+
+                // Configure plant search (using autocomplete)
                 configureAutocomplete(results.data);
             }
         }
@@ -251,15 +262,4 @@ $(function() {  // Call this from DOM's .ready()
             $(placeholders[i]).load(sharedEltUrl);
         }
     }
-
-    // Register on-click listener for filter selections
-    $("#filter-group .dropdown-content button").click(updateFilter);
-
-    // Register on-click listener for clear-all-filters and hide the button
-    var $cf = $("#clear-filters").click(clearFilters);
-    $cf.hide();
-
-    // Click on the current year (first button under dropdown-content of the
-    // last div (a dropdown) under filter-group).
-    $("#filter-group div:last-child .dropdown-content button:first-child").click();
 });
