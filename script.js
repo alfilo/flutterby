@@ -1,248 +1,56 @@
-// Convert scientific name to ID; e.g.:
-//   "Penstemon digitalis 'Mystica'" --> "penstemon-digitalis-mystica"
-// Ignore extra descriptors in image titles:
-//   "Sedum spurium 'Summer Glory'; red/dark pink" -->
-//   "sedum-spurium-summer-glory"
-function makeId(scientificName) {
-    var res = scientificName.toLowerCase()
-        .split(';', 1)[0]  // Take only the part before ';', if present
-        .replace(/[^a-z0-9 ]+/g, '')  // Keep alphanumeric chars and spaces
-        .replace(/ /g, '-');  // Replace spaces with dashes
-    console.log("ID for '" + scientificName + "': " + res);
-    return res;
-}
-
-function fullName(scientificName, commonName) {
-    return scientificName + (commonName ? " (" + commonName + ")" : "");
-}
-
-// Customize the page for the requested plant
-function customizePlantDetailsPage(data) {
-    // Find the entry for the requested plant (name search param)
-    var urlParams = new URLSearchParams(location.search);
-    var requestedPlantName = urlParams.get("name");
-    console.log("Requested plant " + requestedPlantName);
-    var plantInfo;  // Save the matching object in plantInfo
-    for (var i = 0; i < data.length; i++) {
-        if (makeId(data[i]["Scientific Name"]) === requestedPlantName) {
-            plantInfo = data[i];
-            break;
-        }
-    }
-    console.log("Found requested plant info:");
-    console.log(plantInfo);
-
-    // Save non-standard image titles, make the full name of the plant, and delete values
-    // that aren't used in the feature table
-    var sciName = plantInfo["Scientific Name"];
-    var comName = plantInfo["Common Name"];
-    var titles = plantInfo["Image Titles"];
-    var imgTitles = titles ? titles.split(':') : [ sciName ];
-    delete plantInfo["Scientific Name"];
-    delete plantInfo["Common Name"];
-    delete plantInfo["Image Titles"];
-
-    // Update heading
-    $("#header h1").text(fullName(sciName, comName));
-
-    // Fill in the table
-    var $tbody = $(".main tbody");
-    for (var prop in plantInfo) {
-        if (plantInfo[prop]) {  // Skip over features w/o details
-            $("<tr>")
-                .append($("<td>").text(prop))
-                .append($("<td>").text(plantInfo[prop]))
-                .appendTo($tbody);
-        }
-    }
-
-    // Update the plant image(s)
-    var $rdiv = $("div.right");
-    for (var i = 0; i < imgTitles.length; i++) {
-        var title = imgTitles[i];
-        var id = makeId(title);
-        $("<img>")
-            .prop("src", "images/" + id + ".jpg")
-            .prop("title", title)
-            .prop("alt", title)
-            .attr("onerror", "this.src='butterflies.jpg'")
-            .css({'width' : '100%', 'margin-left' : '15px'})
-            .appendTo($rdiv);
-    }
-}
-
-function configureAutocomplete(data) {
-    $("#psearch").autocomplete({
-        source: function(request, response) {
-            var year = $("#psearch-year").val();
-            var matcher = new RegExp($.ui.autocomplete.escapeRegex(request.term), "i");
-            response($.grep(data, function(item) {
-                // Filter by the selected year
-                return item["Year(s) Sold"].includes(year)
-                    && (matcher.test(item["Scientific Name"])
-                        || matcher.test(item["Common Name"]));
-            }));
-        },
-        minLength: 0,
-        select: function(event, ui) {
-            var plantId = makeId(ui.item["Scientific Name"]);
-
-            // In bigger projects, it's safer to use window.location,
-            // because location might be redefined.
-            // Setting location and location.href has the same effect, if
-            // location isn't set.  Both act as if the link is clicked, so
-            // "Back" goes to current page).  location.replace(url) is like
-            // HTTP redirect--it skips the current page for back navigation.
-            // $(location).prop('href', url) is the jQuery way but it's not
-            // an improvement over the below.
-
-            // Navigate to the selected plant
-            location.href = "plant-details.html?name=" + plantId;
-        }
-    }).autocomplete( "instance" )._renderItem = function(ul, item) {
-        var sciName = item["Scientific Name"];
-        var comNameStr = item["Common Name"] ?
-            " (" + item["Common Name"] + ")" : "";
-        return $("<li>")
-            .append("<div><i>" + sciName + "</i>" + comNameStr + "</div>")
-            .appendTo(ul);
-    };
-}
-
-// The data from the CSV file
-var plantData;
-
-// If text is defined, we're running locally
-function handleCSV(text) {
-    Papa.parse(text || "plants.csv", {
-        download: !text,
+function handleCSV() {
+    Papa.parse("plants.csv", {
+        download: true,
         delimiter: '|',
         header: true,
         //dynamicTyping: true,
         skipEmptyLines: true,
         complete: function(results) {
-            console.log("CSV-file parse results:");
-            console.log(results);
-
-            // Save the CSV data in a global for filtering
-            plantData = results.data;
-
-            // If the location includes a search entry, we're customizing the
-            // plant details page for the requested plant; otherwise, we're
-            // setting up the top-level page (plants.html).
-            if (location.search) {
-                customizePlantDetailsPage(results.data);
-            } else {
-                // Register on-click listener for filter selections
-                $("#filter-group .dropdown-content button").click(updateFilter);
-
-                // Register on-click listener for clear-all-filters and hide the button
-                var $cf = $("#clear-filters").click(clearFilters);
-                $cf.hide();
-
-                // Click on the current year (first button under dropdown-content
-                // of the last div (a dropdown) under filter-group)
-                $("#filter-group div:last-child .dropdown-content button:first-child").click();
-
-                // Configure plant search (using autocomplete)
-                configureAutocomplete(results.data);
-            }
-        }
-    });
-}
-
-function customize() {
-    const LOCAL_DOMAINS = ["localhost", "127.0.0.1", ""];
-    var local = LOCAL_DOMAINS.indexOf(location.hostname) >= 0;
-    if (local) {
-        // Get the contents of (local) plants.csv and call
-        // handleCSV with the text of the file as argument
-        $.get("plants.csv", handleCSV);
-    } else {
-        handleCSV();  // No argument (text is undefined)
-    }
-}
-
-// Tracks the current filter selections {feature: detail, ...}
-var curFilters = {};
-
-function clearFilters() {
-    curFilters = {};  // Remove all filter settings
-    // Clear selected style for all filter buttons
-    $("#filter-group").find(".selected").removeClass("selected");
-    $("#filter-results").empty();  // Empty the list of matching plants
-    $(this).hide();  // Hide the clear-all-filters button
-}
-
-function updateFilter() {
-    // Get the value for filter (in this node) and the filter
-    // (in grandparent's first element child)
-    var value = this.textContent.toLowerCase();
-    var filterBtn = this.parentNode.parentNode.firstElementChild;
-    var filter = filterBtn.textContent;
-
-    // Clear selected style in buttons of this filter's dropdown-content
-    // (in case there was a selection in this filter before)
-    $(this.parentNode).find(".selected").removeClass("selected");
-
-    if (curFilters[filter] === value) {
-        // Same setting for filter clicked: delete from current
-        // filters and clear selected style for filter button
-        delete curFilters[filter];
-        $(filterBtn).removeClass("selected");
-    } else {
-        // New or different setting for filter: update current filters
-        // and add selected style to the filter and value buttons
-        curFilters[filter] = value;
-        $(this).addClass("selected");
-        $(filterBtn).addClass("selected");
-    }
-
-    // Empty the list of matching list
-    var $frUl = $("#filter-results").empty();
-
-    // If no filter is set, hide the clear-all-filters button and return
-    if ($.isEmptyObject(curFilters)) {
-        $("#clear-filters").hide();
-        return;
-    }
-
-    // At least one filter is set, show the clear-all-filters button
-    $("#clear-filters").show();
-
-    // Recompute the array of plants matching the filters from scratch
-    var filterPlants = $.grep(plantData, function(item) {
-        // Check item's entries against every filter's selection
-        for (var filter in curFilters) {
-            if (filter === "Zone") {
+            function zoneMatcher(itemVal, reqVal) {
                 // Split the plant's zone range on non-digits and drop
                 // non-numbers, in case of comments at the end
-                var zoneRange = item[filter].split(/\D+/).filter(Number);
+                var zoneRange = itemVal.split(/\D+/).filter(Number);
                 // Exclude plants without Zone numbers
                 if (zoneRange.length == 0) return false;
 
                 // Multiply by 1 to convert strings to numbers
                 var zoneMin = zoneRange[0] * 1;
                 var zoneMax = zoneRange[zoneRange.length - 1] * 1;
-                var selectedZone = curFilters[filter] * 1;
-                if (selectedZone < zoneMin || selectedZone > zoneMax)
-                    return false;  // Out of range, not a match
+                var selectedZone = reqVal * 1;
+                return selectedZone >= zoneMin && selectedZone <= zoneMax;
+            }
+            var content = results.data;  // Save the CSV data
+            var idKeys = ["Scientific Name"];
+            var titleKeys = ["Scientific Name", "Common Name"];
+            var contentDisplay = new ContentDisplay(null, null, content,
+                idKeys, titleKeys, '; ', {"Zone" : zoneMatcher});
 
-            } else if (!item[filter].toLowerCase().includes(curFilters[filter]))
-                // Values in curFilters are lowercase
-                return false;  // Any match fails: skip item (plant)
+            // If the location includes a search entry, we're customizing the
+            // details page for the requested plant; otherwise, we're
+            // setting up the top-level page (plants.html).
+            if (location.search) {
+                contentDisplay.details.generate(true);
+            } else {
+                // Register on-click listener for filter selections
+                $("#filter-group .dropdown-content button").click(function () {
+                    contentDisplay.filters.updateFilter(this);
+                });
+                // Register on-click listener for clear-all-filters
+                var $cf = $("#clear-filters").click(function () {
+                    contentDisplay.filters.clearFilters(this);
+                });
+                $cf.hide();  // hide the clear-all-filters button initially
+                // Click on the latest value in the last dropdown (current year)
+                // This is the first button under dropdown-content of the last div
+                // (a dropdown) under filter-group
+                $("#filter-group div:last-child .dropdown-content button:first-child").click();
+
+                // Configure plant search (using autocomplete); search only through names
+                contentDisplay.search.configureSearch("right", undefined,
+                    ["Year(s) Sold"], ["Scientific Name", "Common Name"]);
+            }
         }
-        return true;  // Passed all filters: keep item (plant)
     });
-
-    // Populate the results list with links to plant-detail pages
-    for (var i = 0; i < filterPlants.length; i++) {
-        var sciName = filterPlants[i]["Scientific Name"];
-        var comName = filterPlants[i]["Common Name"];
-        var href = "plant-details.html?name=" + makeId(sciName);
-        var $a = $("<a>").prop("href", href).text(fullName(sciName, comName));
-        $("<li>").append($a).appendTo($frUl);
-    }
 }
 
 $(function() {  // Call this from DOM's .ready()
@@ -253,13 +61,22 @@ $(function() {  // Call this from DOM's .ready()
     // Replace placeholders with matching shared elements in load.html
     for (var i = 0; i < placeholders.length; i++) {
         var sharedEltUrl = "load.html " + placeholders[i] + "-shared";
-        // Call customize for plant pages (plants.html & plant-details.html).
+        // Call customize for plant pages (plants.html & details.html).
         // Do this after the header load is completed because
         // the header is the only loaded element that may be updated
-        if (i == 0 && location.pathname.includes("plant")) {
-            $(placeholders[i]).load(sharedEltUrl, customize);
+        if (i == 0 && (location.pathname.includes("plants.html") ||
+                       location.pathname.includes("details.html"))) {
+            $(placeholders[i]).load(sharedEltUrl, handleCSV);
         } else {
             $(placeholders[i]).load(sharedEltUrl);
         }
+    }
+    if (location.pathname.includes("faq") ||
+        location.pathname.includes("contact")) {
+        // Register slideToggle for buttons on FAQ and contact pages
+        var $slideBtn = $(".slide-down-btn");
+        $slideBtn.click(function() {
+            $(this).next().slideToggle();
+        });
     }
 });
