@@ -126,7 +126,8 @@ function ContentDisplay(x2js, contentSrc, content, idKeys, titleKeys = idKeys, t
         // Recursively display the object and all its values; start at heading level 3
         function displayObject(obj, $parent, hLevel = 3) {
             for (var prop in obj) {
-                if (prop.toLowerCase() === "images") return;  // Ignore the image tags here
+                if (prop.toLowerCase() === "images")
+                    continue;  // Ignore the image tags here
                 // Skip over tags w/o details or those used in the id or the title
                 if (obj[prop] && !idKeys.includes(prop) && !titleKeys.includes(prop)) {
                     if (typeof obj[prop] === "string") {
@@ -176,7 +177,8 @@ function ContentDisplay(x2js, contentSrc, content, idKeys, titleKeys = idKeys, t
             // Fill in the table (assumes a flat object, like from a CSV file)
             var $tbody = $(".main tbody");
             for (var prop in itemInfo) {
-                if (prop.toLowerCase() === "images") return;  // Ignore the image tags here
+                if (prop.toLowerCase() === "images")
+                    continue;  // Ignore the image tags here
                 // Skip over tags w/o details or those used in the id or the title
                 if (itemInfo[prop] && !idKeys.includes(prop) && !titleKeys.includes(prop)) {
                     $("<tr>")
