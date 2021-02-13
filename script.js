@@ -46,7 +46,7 @@ function handleCSV() {
                 $("#filter-group div:last-child .dropdown-content button:first-child").click();
 
                 // Configure plant search (using autocomplete); search only through names
-                contentDisplay.search.configureSearch("right", undefined,
+                contentDisplay.search.configureSearch("right", {},
                     ["Year(s) Sold"], ["Scientific Name", "Common Name"]);
             }
         }

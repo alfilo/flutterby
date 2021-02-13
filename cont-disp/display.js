@@ -233,7 +233,7 @@ function ContentDisplay(x2js, contentSrc, content, idKeys, titleKeys = idKeys, t
         function matchInObject(obj, matcher, searchKeys) {
             for (var prop in obj) {
                 // Skip over non-search keys and tags w/o details
-                if ((!searchKeys || searchKeys.includes(prop)) && obj[prop]) {
+                if ((!searchKeys.length || searchKeys.includes(prop)) && obj[prop]) {
                     if (typeof obj[prop] === "string") {
                         if (matcher.test(obj[prop])) {
                             return true;
@@ -272,7 +272,7 @@ function ContentDisplay(x2js, contentSrc, content, idKeys, titleKeys = idKeys, t
             return false;
         }
 
-        this.configureSearch = function (column = "right", staticFilters = {}, dynFltrNames = [], searchKeys = null) {
+        this.configureSearch = function (column = "right", staticFilters = {}, dynFltrNames = [], searchKeys = []) {
             $("#search-" + column).autocomplete({
                 source: function (request, response) {
                     var filters = Object.assign({}, staticFilters);
