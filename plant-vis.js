@@ -49,6 +49,12 @@ function PlantVis(content, parent) {
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
             .classed("bloom", true);
+        svg.append("text")
+            .style("text-anchor", "middle")
+            .attr("x", margin.left + width / 2)
+            .attr("y", margin.top / 2)
+            .style("font-weight", "bold")
+            .text("Bloom Times for Selected Plants");
         var chartGroup = svg.append("g")
             .attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
         var y = d3.scaleBand()
@@ -101,6 +107,12 @@ function PlantVis(content, parent) {
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
             .classed("zone", true);
+        svg.append("text")
+            .style("text-anchor", "middle")
+            .attr("x", margin.left + width / 2)
+            .attr("y", margin.top / 2)
+            .style("font-weight", "bold")
+            .text("Zone Ranges for Selected Plants");
         var chartGroup = svg.append("g")
             .attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
         var y = d3.scaleBand()
