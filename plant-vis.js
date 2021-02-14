@@ -1,46 +1,46 @@
-function PlantVis() {
-    var tooltip = d3.select("body").append("div")
-        .style("position", "absolute")
-        .style("pointer-events", "none")
-        .style("opacity", 0);
-
-    function makeData(content) {
-        return content.reduce(function (accum, plant) {
-            if (plant["Zone"] && /^\d+/.test(plant["Zone"]) && plant["When it Blooms"]) {
-                // Split the plant's zone range on non-digits and drop
-                // non-numbers, in case of comments at the end
-                var zoneRange = plant["Zone"].split(/\D+/).filter(Number);
-                // Multiply by 1 to convert strings to numbers
-                var zoneLow = zoneRange[0] * 1;
-                var zoneHigh = zoneRange[zoneRange.length - 1] * 1;
-
-                function makeDate(str, day = 1) {
-                    var dateMap = { "early": "5", "mid": "15", "late": "25" };
-                    var range = str.split(/\W+/);
-                    var dateStr = range.length > 1 ? range[1] + dateMap[range[0].toLowerCase()] : range[0] + day;
-                    var parseDate = d3.timeParse("%B%d");
-                    return parseDate(dateStr);
-                }
-                // Take only the part before ' (', if present
-                var bloomRange = plant["When it Blooms"]
-                    .split(/\s*\(/, 1)[0]
-                    .split(/\s*\-\s*/);
-                var bloomLow = makeDate(bloomRange[0]);
-                var bloomHigh = makeDate(bloomRange[bloomRange.length - 1], 30);
-                accum.push({
-                    name: plant["Scientific Name"],
-                    zone: { low: zoneLow, high: zoneHigh },
-                    bloom: { low: bloomLow, high: bloomHigh }
-                });
-            }
-            return accum;
-        }, []);
+function PlantVis(content, parent) {
+    var tooltip = d3.select("body").selectAll(".tooltip");
+    if (tooltip.empty()) {
+        tooltip = d3.select("body").append("div")
+            .classed("tooltip", true)
+            .style("position", "absolute")
+            .style("pointer-events", "none")
+            .style("opacity", 0);
     }
 
-    this.bloomChart = function (content, parent) {
-        d3.selectAll("svg.bloom").remove();
-        var data = makeData(content);
+    var data = content.reduce(function (accum, plant) {
+        if (plant["Zone"] && /^\d+/.test(plant["Zone"]) && plant["When it Blooms"]) {
+            // Split the plant's zone range on non-digits and drop
+            // non-numbers, in case of comments at the end
+            var zoneRange = plant["Zone"].split(/\D+/).filter(Number);
+            // Multiply by 1 to convert strings to numbers
+            var zoneLow = zoneRange[0] * 1;
+            var zoneHigh = zoneRange[zoneRange.length - 1] * 1;
 
+            function makeDate(str, day = 1) {
+                var dateMap = { "early": "5", "mid": "15", "late": "25" };
+                var range = str.split(/\W+/);
+                var dateStr = range.length > 1 ? range[1] + dateMap[range[0].toLowerCase()] : range[0] + day;
+                var parseDate = d3.timeParse("%B%d");
+                return parseDate(dateStr);
+            }
+            // Take only the part before ' (', if present
+            var bloomRange = plant["When it Blooms"]
+                .split(/\s*\(/, 1)[0]
+                .split(/\s*\-\s*/);
+            var bloomLow = makeDate(bloomRange[0]);
+            var bloomHigh = makeDate(bloomRange[bloomRange.length - 1], 30);
+            accum.push({
+                name: plant["Scientific Name"],
+                zone: { low: zoneLow, high: zoneHigh },
+                bloom: { low: bloomLow, high: bloomHigh }
+            });
+        }
+        return accum;
+    }, []);
+
+    this.bloomChart = function () {
+        d3.selectAll("svg.bloom").remove();
         var margin = { top: 50, bottom: 100, left: 250, right: 10 };
         var width = Math.max(parent.clientWidth, 500) - margin.left - margin.right;
         var height = 20 * data.length;
@@ -91,10 +91,8 @@ function PlantVis() {
         chartGroup.append("g").call(yAxis);
     }
 
-    this.zoneChart = function (content, parent) {
+    this.zoneChart = function () {
         d3.selectAll("svg.zone").remove();
-        var data = makeData(content);
-
         var margin = { top: 50, bottom: 50, left: 250, right: 10 };
         var width = Math.max(parent.clientWidth, 500) - margin.left - margin.right;
         var height = 20 * data.length;

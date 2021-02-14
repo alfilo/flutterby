@@ -31,14 +31,13 @@ function handleCSV() {
             if (location.search) {
                 contentDisplay.details.generate(true);
             } else {
-                var plantVis = new PlantVis();
-                var parent = $("div.column.main")[0];
                 function visCallback(filteredContent) {
-                    plantVis.zoneChart(filteredContent, parent);
-                    plantVis.bloomChart(filteredContent, parent);
+                    var plantVis = new PlantVis(filteredContent, $("div.column.main")[0]);
+                    plantVis.zoneChart();
+                    plantVis.bloomChart();
                     $(window).on("resize", function () {
-                        plantVis.zoneChart(filteredContent, parent);
-                        plantVis.bloomChart(filteredContent, parent);
+                        plantVis.zoneChart();
+                        plantVis.bloomChart();
                     });
                 }
 
