@@ -31,13 +31,24 @@ function handleCSV() {
             if (location.search) {
                 contentDisplay.details.generate(true);
             } else {
+                var plantVis = new PlantVis();
+                var parent = $("div.column.main")[0];
+                function visCallback(filteredContent) {
+                    plantVis.zoneChart(filteredContent, parent);
+                    plantVis.bloomChart(filteredContent, parent);
+                    $(window).on("resize", function () {
+                        plantVis.zoneChart(filteredContent, parent);
+                        plantVis.bloomChart(filteredContent, parent);
+                    });
+                }
+
                 // Register on-click listener for filter selections
                 $("#filter-group .dropdown-content button").click(function () {
-                    contentDisplay.filters.updateFilter(this);
+                    contentDisplay.filters.updateFilter(this, visCallback);
                 });
                 // Register on-click listener for clear-all-filters
                 var $cf = $("#clear-filters").click(function () {
-                    contentDisplay.filters.clearFilters(this);
+                    contentDisplay.filters.clearFilters(this, visCallback);
                 });
                 $cf.hide();  // hide the clear-all-filters button initially
                 // Click on the latest value in the last dropdown (current year)

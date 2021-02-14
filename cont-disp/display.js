@@ -108,13 +108,16 @@ function ContentDisplay(x2js, contentSrc, content, idKeys, titleKeys = idKeys, t
                 .text(this.makeDetailsText(item));
         }
 
-        /* Generate links for content items and add to list */
-        this.generate = function (list, filters = {}) {
+        /* Generate links for content items and add to list.
+           Invoke callback, if present (e.g., visualization).
+         */
+        this.generate = function (list, filters = {}, callback = null) {
             var filteredContent = $.grep(content, filterMatcherFn(filters));
             for (var i = 0; i < filteredContent.length; i++) {
                 var link = this.makeDetailsLink(filteredContent[i]);
                 $("<li>").append(link).appendTo(list);
             }
+            if (callback) callback(filteredContent);
         }
     }
 
@@ -399,7 +402,7 @@ function ContentDisplay(x2js, contentSrc, content, idKeys, titleKeys = idKeys, t
         // Tracks the current filter selections {feature: detail, ...}
         var curFilters = {};
 
-        this.clearFilters = function (button) {
+        this.clearFilters = function (button, callback) {
             curFilters = {};  // Remove all filter settings
             // Clear selected style for all filter buttons
             $("#filter-group").find(".selected").removeClass("selected");
@@ -407,10 +410,10 @@ function ContentDisplay(x2js, contentSrc, content, idKeys, titleKeys = idKeys, t
 
             // Empty the list of matching items and make links for all items
             var $frUl = $("#filter-results").empty();
-            links.generate($frUl);
+            links.generate($frUl, {}, callback);
         }
 
-        this.updateFilter = function (clickBtn) {
+        this.updateFilter = function (clickBtn, callback) {
             // Get the value for filter (in this node) and the filter
             // (in grandparent's first element child)
             var value = clickBtn.textContent.toLowerCase();
@@ -443,7 +446,7 @@ function ContentDisplay(x2js, contentSrc, content, idKeys, titleKeys = idKeys, t
 
             // Empty the list of matching items and make links for matching items
             var $frUl = $("#filter-results").empty();
-            links.generate($frUl, curFilters);
+            links.generate($frUl, curFilters, callback);
         };
     }
 }
