@@ -86,9 +86,11 @@ function PlantVis(content, parent) {
                     .style("left", window.pageXOffset + svgBox.left + margin.left + x(d.bloom.low) + "px")
                     .style("top", window.pageYOffset + svgBox.top + margin.top + y(d.name) + "px")
                     .style("opacity", 1);
+                d3.select(this).attr("opacity", .6);
             })
             .on("mouseout", function (e, d) {
                 tooltip.style("opacity", 0);
+                d3.select(this).attr("opacity", 1);
             })
         var xAxis = d3.axisBottom(x);
         var yAxis = d3.axisLeft(y).tickSizeOuter(0);
@@ -148,9 +150,11 @@ function PlantVis(content, parent) {
                     .style("left", window.pageXOffset + svgBox.left + margin.left + x(d.zone.low) + "px")
                     .style("top", window.pageYOffset + svgBox.top + margin.top + y(d.name) + "px")
                     .style("opacity", 1);
+                d3.select(this).attr("opacity", .6);
             })
             .on("mouseout", function (e, d) {
                 tooltip.style("opacity", 0);
+                d3.select(this).attr("opacity", 1);
             })
         var xAxis = d3.axisBottom(x).ticks(5);  // Don't create fractional zone ticks
         var yAxis = d3.axisLeft(y).tickSizeOuter(0);
