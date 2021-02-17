@@ -32,6 +32,7 @@ function PlantVis(content, parent) {
             var bloomHigh = makeDate(bloomRange[bloomRange.length - 1], 30);
             accum.push({
                 name: plant["Scientific Name"],
+                link: plant.link,
                 zone: { low: zoneLow, high: zoneHigh },
                 bloom: { low: bloomLow, high: bloomHigh }
             });
@@ -69,7 +70,11 @@ function PlantVis(content, parent) {
             .range([0, width]);
         chartGroup.selectAll("rect")
           .data(data)
-          .enter().append("rect")
+          .enter()
+          .append("a")
+            .attr("href", function (d) { return d.link.href; })
+            .attr("target", "_blank")  // Open link in new tab
+          .append("rect")
             .attr("y", function (d) { return y(d.name); })
             .attr("x", function (d) { return x(d.bloom.low); })
             .attr("height", y.bandwidth())
@@ -127,7 +132,11 @@ function PlantVis(content, parent) {
             .range([0, width]);
         chartGroup.selectAll("rect")
           .data(data)
-          .enter().append("rect")
+          .enter()
+          .append("a")
+            .attr("href", function (d) { return d.link.href; })
+            .attr("target", "_blank")  // Open link in new tab
+          .append("rect")
             .attr("y", function (d) { return y(d.name); })
             .attr("x", function (d) { return x(d.zone.low); })
             .attr("height", y.bandwidth())

@@ -116,6 +116,7 @@ function ContentDisplay(x2js, contentSrc, content, idKeys, titleKeys = idKeys, t
             for (var i = 0; i < filteredContent.length; i++) {
                 var link = this.makeDetailsLink(filteredContent[i]);
                 $("<li>").append(link).appendTo(list);
+                filteredContent[i].link = link[0];  // Add link to item info
             }
             if (callback) callback(filteredContent);
         }
