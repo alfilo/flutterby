@@ -1,4 +1,6 @@
-function ContentDisplay(x2js, contentSrc, content, idKeys, titleKeys = idKeys, titleSep = ' ', customFltrMatchers = {}) {
+function ContentDisplay(x2js, contentSrc, content, idKeys, titleKeys = idKeys,
+    titleSep = ' ', customFltrMatchers = {}, newTab = false) {
+
     // General helper for converting a key value into a valid ID
     function makeId(string) {
         return string.toLowerCase()
@@ -105,6 +107,7 @@ function ContentDisplay(x2js, contentSrc, content, idKeys, titleKeys = idKeys, t
 
         this.makeDetailsLink = function (item) {
             return $("<a>").prop("href", this.makeDetailsHref(item))
+                .prop("target", newTab ? "_blank" : "_self")
                 .text(this.makeDetailsText(item));
         }
 
@@ -314,15 +317,20 @@ function ContentDisplay(x2js, contentSrc, content, idKeys, titleKeys = idKeys, t
                     $(".column." + column + " img").show();
                 },
                 select: function (event, ui) {
-                    // Setting location and location.href has the same effect, if
-                    // location isn't set.  Both act as if the link is clicked, so
-                    // "Back" goes to current page).  location.replace(url) is like
-                    // HTTP redirect--it skips the current page for back navigation.
-                    // $(location).prop('href', url) is the jQuery way but it's not
-                    // an improvement over the below.
+                    if (newTab) {
+                        // Not blocked as a popup because it's caused by a user action
+                        window.open(links.makeDetailsHref(ui.item), "_blank");
+                    } else {
+                        // Setting location and location.href has the same effect, if
+                        // location isn't set.  Both act as if the link is clicked, so
+                        // "Back" goes to current page).  location.replace(url) is like
+                        // HTTP redirect--it skips the current page for back navigation.
+                        // $(location).prop('href', url) is the jQuery way but it's not
+                        // an improvement over the below.
 
-                    // Navigate to the selected item
-                    location.href = links.makeDetailsHref(ui.item);
+                        // Navigate to the selected item
+                        location.href = links.makeDetailsHref(ui.item);
+                    }
                 }
             }).autocomplete("instance")._renderItem = function (ul, item) {
                 return $("<li>")

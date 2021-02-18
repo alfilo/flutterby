@@ -23,7 +23,7 @@ function handleCSV() {
             var idKeys = ["Scientific Name"];
             var titleKeys = ["Scientific Name", "Common Name"];
             var contentDisplay = new ContentDisplay(null, null, content,
-                idKeys, titleKeys, '; ', {"Zone" : zoneMatcher});
+                idKeys, titleKeys, '; ', {"Zone" : zoneMatcher}, true);
 
             // If the location includes a search entry, we're customizing the
             // details page for the requested plant; otherwise, we're
