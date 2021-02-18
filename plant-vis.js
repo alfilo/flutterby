@@ -55,6 +55,7 @@ function PlantVis(content, parent) {
             .attr("x", margin.left + width / 2)
             .attr("y", margin.top / 2)
             .style("font-weight", "bold")
+            .style("fill", "currentColor")
             .text("Bloom Times for Selected Plants");
         var chartGroup = svg.append("g")
             .attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
@@ -119,6 +120,7 @@ function PlantVis(content, parent) {
             .attr("x", margin.left + width / 2)
             .attr("y", margin.top / 2)
             .style("font-weight", "bold")
+            .style("fill", "currentColor")
             .text("Zone Ranges for Selected Plants");
         var chartGroup = svg.append("g")
             .attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
