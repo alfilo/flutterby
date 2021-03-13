@@ -1,5 +1,6 @@
 function ContentDisplay(x2js, contentSrc, content, idKeys, titleKeys = idKeys,
-    titleSep = ' ', customFltrMatchers = {}, newTab = false) {
+    titleSep = ' ', customFltrMatchers = {}, newTab = false, trackSelection = false,
+    selectionCallback = null) {
 
     // General helper for converting a key value into a valid ID
     function makeId(string) {
@@ -84,6 +85,8 @@ function ContentDisplay(x2js, contentSrc, content, idKeys, titleKeys = idKeys,
 
     /* Link creation and helpers */
     this.links = new function Links() {
+        var filteredContent = [];
+        var selection = [];
         this.makeDetailsHref = function (item) {
             // Build the link with URL search params out of item's idKeys values
             var urlParams = new URLSearchParams();
@@ -96,32 +99,85 @@ function ContentDisplay(x2js, contentSrc, content, idKeys, titleKeys = idKeys,
             return "details.html?" + urlParams.toString();
         }
 
-        this.makeDetailsText = function (item) {
-            // Build the link text out of item's titleKeys values
-            var text = "";
+        this.makeItemTitle = function (item) {
+            var title = "";
             for (var j = 0; j < titleKeys.length; j++) {
-                text += item[titleKeys[j]] + titleSep;
+                title += item[titleKeys[j]] + titleSep;
             }
-            return text.slice(0, -titleSep.length);
+            return title.slice(0, -titleSep.length);
         }
 
         this.makeDetailsLink = function (item) {
             return $("<a>").prop("href", this.makeDetailsHref(item))
                 .prop("target", newTab ? "_blank" : "_self")
-                .text(this.makeDetailsText(item));
+                .text(this.makeItemTitle(item));
+        }
+
+        this.clearSelect = function () {
+            selection = [];
+            $("#filter-results input:checkbox:checked").prop("checked", false);
+            if (selectionCallback && filteredContent.length) {
+                selectionCallback(filteredContent);
+            }
+        }
+
+        this.selectAll = function () {
+            for (var i = 0; i < filteredContent.length; i++) {
+                if (!selection.includes(filteredContent[i])) {
+                    selection.push(filteredContent[i]);
+                }
+            }
+            $("#filter-results input:checkbox:not(:checked)").prop("checked", true);
+            if (selectionCallback && selection.length) selectionCallback(selection);
         }
 
         /* Generate links for content items and add to list.
            Invoke callback, if present (e.g., visualization).
          */
-        this.generate = function (list, filters = {}, callback = null) {
-            var filteredContent = $.grep(content, filterMatcherFn(filters));
+        this.generate = function (list, filters = {}) {
+            filteredContent = $.grep(content, filterMatcherFn(filters));
             for (var i = 0; i < filteredContent.length; i++) {
-                var link = this.makeDetailsLink(filteredContent[i]);
-                $("<li>").append(link).appendTo(list);
+                var item = filteredContent[i];
+                var li = $("<li>").appendTo(list);
+                var link = this.makeDetailsLink(item);
+                if (trackSelection) {
+                    var checkbox = $("<input>")
+                        .attr("type", "checkbox")
+                        .attr("name", "vis-select")
+                        .attr("value", this.makeItemTitle(item))
+                        .prop("checked", selection.includes(item));
+                    li.append(checkbox)
+                        .append($("<label>").append(link));
+
+                    checkbox.click((function() {
+                            var thisItem = item;
+                            return function () {
+                                if (this.checked) {
+                                    selection.push(thisItem);
+                                } else {
+                                    // Uses strict equality for objects
+                                    var idx = selection.indexOf(thisItem);
+                                    selection.splice(idx, 1);
+                                }
+                                if (selectionCallback) {
+                                    selectionCallback(selection.length ?
+                                        selection : filteredContent);
+                                }
+                            }
+                        })() );
+
+                } else {
+                    li.append(link);
+                }
+
                 filteredContent[i].link = link[0];  // Add link to item info
             }
-            if (callback) callback(filteredContent);
+
+            // If we're using selections and the selection is non-empty,
+            // skip the callback for filteredContent
+            if (selectionCallback && !(trackSelection && selection.length)) {
+                selectionCallback(filteredContent);
+            }
         }
     }
 
@@ -220,7 +276,7 @@ function ContentDisplay(x2js, contentSrc, content, idKeys, titleKeys = idKeys,
             }
 
             // Make heading out of the displayed item's keys
-            $("#header h1").text(links.makeDetailsText(itemInfo));
+            $("#header h1").text(links.makeItemTitle(itemInfo));
 
             if (makeTable) {
                 generateTable(itemInfo);
@@ -334,7 +390,7 @@ function ContentDisplay(x2js, contentSrc, content, idKeys, titleKeys = idKeys,
                 }
             }).autocomplete("instance")._renderItem = function (ul, item) {
                 return $("<li>")
-                    .append("<div><i>" + links.makeDetailsText(item) + "</i>" + "</div>")
+                    .append("<div><i>" + links.makeItemTitle(item) + "</i>" + "</div>")
                     .appendTo(ul);
             };
         }
@@ -411,7 +467,7 @@ function ContentDisplay(x2js, contentSrc, content, idKeys, titleKeys = idKeys,
         // Tracks the current filter selections {feature: detail, ...}
         var curFilters = {};
 
-        this.clearFilters = function (button, callback) {
+        this.clearFilters = function (button) {
             curFilters = {};  // Remove all filter settings
             // Clear selected style for all filter buttons
             $("#filter-group").find(".selected").removeClass("selected");
@@ -419,10 +475,10 @@ function ContentDisplay(x2js, contentSrc, content, idKeys, titleKeys = idKeys,
 
             // Empty the list of matching items and make links for all items
             var $frUl = $("#filter-results").empty();
-            links.generate($frUl, {}, callback);
+            links.generate($frUl, {}, selectionCallback);
         }
 
-        this.updateFilter = function (clickBtn, callback) {
+        this.updateFilter = function (clickBtn) {
             // Get the value for filter (in this node) and the filter
             // (in grandparent's first element child)
             var value = clickBtn.textContent.toLowerCase();
@@ -455,7 +511,7 @@ function ContentDisplay(x2js, contentSrc, content, idKeys, titleKeys = idKeys,
 
             // Empty the list of matching items and make links for matching items
             var $frUl = $("#filter-results").empty();
-            links.generate($frUl, curFilters, callback);
+            links.generate($frUl, curFilters);
         };
     }
 }

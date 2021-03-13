@@ -22,8 +22,20 @@ function handleCSV() {
             var content = results.data;  // Save the CSV data
             var idKeys = ["Scientific Name"];
             var titleKeys = ["Scientific Name", "Common Name"];
+
+            function visCallback(items) {
+                var plantVis = new PlantVis(items, $("div.column.main")[0]);
+                plantVis.zoneChart();
+                plantVis.bloomChart();
+                $(window).on("resize", function () {
+                    plantVis.zoneChart();
+                    plantVis.bloomChart();
+                });
+            }
+
             var contentDisplay = new ContentDisplay(null, null, content,
-                idKeys, titleKeys, '; ', {"Zone" : zoneMatcher}, true);
+                idKeys, titleKeys, '; ', {"Zone" : zoneMatcher}, true, true,
+                visCallback);
 
             // If the location includes a search entry, we're customizing the
             // details page for the requested plant; otherwise, we're
@@ -31,29 +43,27 @@ function handleCSV() {
             if (location.search) {
                 contentDisplay.details.generate(true);
             } else {
-                function visCallback(filteredContent) {
-                    var plantVis = new PlantVis(filteredContent, $("div.column.main")[0]);
-                    plantVis.zoneChart();
-                    plantVis.bloomChart();
-                    $(window).on("resize", function () {
-                        plantVis.zoneChart();
-                        plantVis.bloomChart();
-                    });
-                }
-
                 // Register on-click listener for filter selections
                 $("#filter-group .dropdown-content button").click(function () {
-                    contentDisplay.filters.updateFilter(this, visCallback);
+                    contentDisplay.filters.updateFilter(this);
                 });
                 // Register on-click listener for clear-all-filters
                 var $cf = $("#clear-filters").click(function () {
-                    contentDisplay.filters.clearFilters(this, visCallback);
+                    contentDisplay.filters.clearFilters(this);
                 });
                 $cf.hide();  // hide the clear-all-filters button initially
                 // Click on the latest value in the last dropdown (current year)
                 // This is the first button under dropdown-content of the last div
                 // (a dropdown) under filter-group
-                $("#filter-group div:last-child .dropdown-content button:first-child").click();
+                $("#filter-group div:last-of-type .dropdown-content button:first-child").click();
+
+                // Register on-click listeners for visualization selections
+                $("#select-all").click(function () {
+                    contentDisplay.links.selectAll();
+                });
+                $("#clear-select").click(function () {
+                    contentDisplay.links.clearSelect();
+                });
 
                 // Configure plant search (using autocomplete); search only through names
                 contentDisplay.search.configureSearch("right", {},

@@ -33,7 +33,7 @@
     <span class="news">For this year's requests, please keep the
       "Year(s) Sold" filter set to 2021.</span>
     </p>
-    <div id="filter-group">
+    <div id="filter-group" class="button-group">
       <div class="dropdown">
         <button type="button" class="filter">Type</button>
         <div class="dropdown-content">
@@ -86,9 +86,13 @@
           <button type="button" class="filter-value" disabled>2017</button>
         </div>
       </div>
+      <button type="button" id="clear-filters">Clear All Filters &#x274C</button>
     </div>
 
-    <button type="button" id="clear-filters">Clear All Filters &#x274C</button>
+    <div class="button-group">
+      <button type="button" id="select-all">Select All</button>
+      <button type="button" id="clear-select">Clear Selections</button>
+    </div>
 
     <ul id="filter-results"></ul>
   </div>
