@@ -56,7 +56,7 @@ function PlantVis(content, parent) {
             .attr("y", margin.top / 2)
             .style("font-weight", "bold")
             .style("fill", "currentColor")
-            .text("Bloom Times for Selected Plants");
+            .text("Bloom Periods for Selected Plants");
         var chartGroup = svg.append("g")
             .attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
         var y = d3.scaleBand()
