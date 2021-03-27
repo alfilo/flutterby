@@ -8,8 +8,8 @@ function PlantVis(content, parent) {
             .style("opacity", 0);
     }
 
-    var data = content.reduce(function (accum, plant) {
-        if (plant["Zone"] && /^\d+/.test(plant["Zone"]) && plant["When it Blooms"]) {
+    var zoneData = content.reduce(function (accum, plant) {
+        if (plant["Zone"] && /^\d+/.test(plant["Zone"])) {
             // Split the plant's zone range on non-digits and drop
             // non-numbers, in case of comments at the end
             var zoneRange = plant["Zone"].split(/\D+/).filter(Number);
@@ -17,6 +17,17 @@ function PlantVis(content, parent) {
             var zoneLow = zoneRange[0] * 1;
             var zoneHigh = zoneRange[zoneRange.length - 1] * 1;
 
+            accum.push({
+                name: plant["Scientific Name"],
+                link: plant.link,
+                zone: { low: zoneLow, high: zoneHigh }
+            });
+        }
+        return accum;
+    }, []);
+
+    var bloomData = content.reduce(function (accum, plant) {
+        if (plant["When it Blooms"]) {
             function makeDate(str, day = 1) {
                 var dateMap = { "early": "5", "mid": "15", "late": "25" };
                 var range = str.split(/\W+/);
@@ -33,7 +44,6 @@ function PlantVis(content, parent) {
             accum.push({
                 name: plant["Scientific Name"],
                 link: plant.link,
-                zone: { low: zoneLow, high: zoneHigh },
                 bloom: { low: bloomLow, high: bloomHigh }
             });
         }
@@ -44,8 +54,9 @@ function PlantVis(content, parent) {
         d3.selectAll("svg.bloom").remove();
         var margin = { top: 50, bottom: 100, left: 250, right: 10 };
         var width = Math.max(parent.clientWidth, 500) - margin.left - margin.right;
-        var height = 20 * data.length;
-        var rainbow = d3.scaleSequential(d3.interpolateRainbow).domain([0, data.length]);
+        var height = 20 * bloomData.length;
+        var rainbow = d3.scaleSequential(d3.interpolateRainbow)
+            .domain([0, bloomData.length]);
         var svg = d3.select(parent).append("svg")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
@@ -60,17 +71,17 @@ function PlantVis(content, parent) {
         var chartGroup = svg.append("g")
             .attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
         var y = d3.scaleBand()
-            .domain(data.map(function (d) { return d.name; }))
+            .domain(bloomData.map(function (d) { return d.name; }))
             // Don't reverse plant order (alphabetically from top down)
             .range([0, height])
             .paddingInner(.1);
-        var minBloom = d3.min(data, function (d) { return d.bloom.low; });
-        var maxBloom = d3.max(data, function (d) { return d.bloom.high; });
+        var minBloom = d3.min(bloomData, function (d) { return d.bloom.low; });
+        var maxBloom = d3.max(bloomData, function (d) { return d.bloom.high; });
         var x = d3.scaleTime()
             .domain([minBloom, maxBloom])
             .range([0, width]);
         chartGroup.selectAll("rect")
-          .data(data)
+          .data(bloomData)
           .enter()
           .append("a")
             .attr("href", function (d) { return d.link.href; })
@@ -109,8 +120,9 @@ function PlantVis(content, parent) {
         d3.selectAll("svg.zone").remove();
         var margin = { top: 50, bottom: 50, left: 250, right: 10 };
         var width = Math.max(parent.clientWidth, 500) - margin.left - margin.right;
-        var height = 20 * data.length;
-        var rainbow = d3.scaleSequential(d3.interpolateRainbow).domain([0, data.length]);
+        var height = 20 * zoneData.length;
+        var rainbow = d3.scaleSequential(d3.interpolateRainbow)
+            .domain([0, zoneData.length]);
         var svg = d3.select(parent).append("svg")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
@@ -125,17 +137,17 @@ function PlantVis(content, parent) {
         var chartGroup = svg.append("g")
             .attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
         var y = d3.scaleBand()
-            .domain(data.map(function (d) { return d.name; }))
+            .domain(zoneData.map(function (d) { return d.name; }))
             // Don't reverse plant order (alphabetically from top down)
             .range([0, height])
             .paddingInner(.1);
-        var minZone = d3.min(data, function (d) { return d.zone.low; });
-        var maxZone = d3.max(data, function (d) { return d.zone.high; });
+        var minZone = d3.min(zoneData, function (d) { return d.zone.low; });
+        var maxZone = d3.max(zoneData, function (d) { return d.zone.high; });
         var x = d3.scaleLinear()
             .domain([minZone, maxZone])
             .range([0, width]);
         chartGroup.selectAll("rect")
-          .data(data)
+          .data(zoneData)
           .enter()
           .append("a")
             .attr("href", function (d) { return d.link.href; })
