@@ -33,9 +33,15 @@ function handleCSV() {
                 });
             }
 
-            var contentDisplay = new ContentDisplay(null, null, content,
-                idKeys, titleKeys, '; ', {"Zone" : zoneMatcher}, true, true,
-                visCallback);
+            var contentDisplay = new ContentDisplay(content, idKeys,
+                {
+                    titleKeys: titleKeys,
+                    titleSep: '; ',
+                    customFltrMatchers: { "Zone": zoneMatcher },
+                    newTab: true,
+                    trackSelection: true,
+                    selectionCallback: visCallback
+                });
 
             // If the location includes a search entry, we're customizing the
             // details page for the requested plant; otherwise, we're
