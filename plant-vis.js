@@ -52,6 +52,8 @@ function PlantVis(content, parent) {
 
     this.bloomChart = function () {
         d3.selectAll("svg.bloom").remove();
+        if (!bloomData.length) return;
+
         var margin = { top: 50, bottom: 100, left: 250, right: 10 };
         var width = Math.max(parent.clientWidth, 500) - margin.left - margin.right;
         var height = 20 * bloomData.length;
@@ -118,6 +120,8 @@ function PlantVis(content, parent) {
 
     this.zoneChart = function () {
         d3.selectAll("svg.zone").remove();
+        if (!zoneData.length) return;
+
         var margin = { top: 50, bottom: 50, left: 250, right: 10 };
         var width = Math.max(parent.clientWidth, 500) - margin.left - margin.right;
         var height = 20 * zoneData.length;
