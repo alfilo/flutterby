@@ -482,7 +482,7 @@ function ContentDisplay(content, idKeys, opts) {
 
             // Empty the list of matching items and make links for all items
             var $frUl = $("#filter-results").empty();
-            links.generate($frUl, {}, opts.selectionCallback);
+            links.generate($frUl, {});
         }
 
         this.updateFilter = function (clickBtn) {
