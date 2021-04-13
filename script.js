@@ -97,6 +97,36 @@ $(function() {  // Call this from DOM's .ready()
             $(placeholders[i]).load(sharedEltUrl);
         }
     }
+
+    try {
+        // Check for localStorage availability and successful modification
+        window.localStorage.setItem("test-key", "test-value");
+        window.localStorage.removeItem("test-key");
+
+        if (location.pathname.includes("plants.html")) {
+            $("#select-btns")
+                .before("<p>Selections are also used to prepopulate Request" +
+                    " form, which you will be able to modify.</p>");
+        }
+        if (location.pathname.includes("request.html")) {
+            var reqStr = "Qty Plant\n";
+            for (var i = 0; i < window.localStorage.length; i++) {
+                var key = window.localStorage.key(i);
+                var value = window.localStorage.getItem(key);
+                reqStr += value + "\t" + key + "\n";
+            }
+            if (window.localStorage.length) {
+                $("#plants").val(reqStr);
+                $("#plants")
+                    .before("<p>The request below includes your selections." +
+                        "<br>Please update plants and quantities as needed.</p>");
+            }
+        }
+    } catch (err) {
+        console.log("Local storage not available; not persisting selections");
+        console.log(err.name + ": " + err.message);
+    }
+
     if (location.pathname.includes("faq") ||
         location.pathname.includes("contact")) {
         // Register slideToggle for buttons on FAQ and contact pages
