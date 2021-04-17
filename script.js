@@ -11,7 +11,7 @@ function handleCSV() {
                 // non-numbers, in case of comments at the end
                 var zoneRange = itemVal.split(/\D+/).filter(Number);
                 // Exclude plants without Zone numbers
-                if (zoneRange.length == 0) return false;
+                if (!zoneRange.length) return false;
 
                 // Multiply by 1 to convert strings to numbers
                 var zoneMin = zoneRange[0] * 1;
