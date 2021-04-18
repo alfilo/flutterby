@@ -1,3 +1,5 @@
+"use strict";
+
 function handleCSV() {
     Papa.parse("plants.csv", {
         download: true,

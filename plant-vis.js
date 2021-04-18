@@ -1,3 +1,5 @@
+"use strict";
+
 function PlantVis(content, parent) {
     var tooltip = d3.select("body").selectAll(".tooltip");
     if (tooltip.empty()) {
