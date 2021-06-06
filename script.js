@@ -40,6 +40,7 @@ function handleCSV() {
                     titleKeys: titleKeys,
                     titleSep: '; ',
                     customFltrMatchers: { "Zone": zoneMatcher },
+                    detailTable: true,
                     newTab: true,
                     trackSelection: true,
                     selectionCallback: visCallback
@@ -49,7 +50,7 @@ function handleCSV() {
             // details page for the requested plant; otherwise, we're
             // setting up the top-level page (plants.html).
             if (location.search) {
-                contentDisplay.details.generate(true);
+                contentDisplay.details.generate();
             } else {
                 // Register on-click listener for filter selections
                 $("#filter-group .dropdown-content button").click(function () {
@@ -74,7 +75,7 @@ function handleCSV() {
                 });
 
                 // Configure plant search (using autocomplete); search only through names
-                contentDisplay.search.configureSearch("right", {},
+                contentDisplay.search.configureSearch("side", {},
                     ["Year(s) Sold"], ["Scientific Name", "Common Name"]);
             }
         }
