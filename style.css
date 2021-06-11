@@ -1,17 +1,18 @@
 /* Adjust the styling for the header from display.css */
 #header {
-    /* Can't set the opacity of a background.  Workaround: start with another
-       "image": a gradient from white to white with opacity 0.4.
-       For wide-enough screens, let the real image cover part of the screen
-       and repeat left-to-right.
+  /* Can't set the opacity of a background.  Workaround: start with another
+     "image": a gradient from white to white with opacity 0.4.
+     For wide-enough screens, let the real image cover part of the screen
+     and repeat left-to-right.
    */
-    background-image: linear-gradient(rgba(255,255,255,.4), rgba(255,255,255,.4)),
-                      url(images/gaillardia-grandiflora.jpg);
-    background-size: cover, 60%;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.4)),
+    url(images/gaillardia-grandiflora.jpg);
+  background-size: cover, 60%;
 }
 
 /* Replace bullet points with checkboxes */
 #filter-results {
-    list-style-type: none;
-    padding: 0;
+  list-style-type: none;
+  padding: 0;
 }
