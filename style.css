@@ -6,8 +6,8 @@
      and repeat left-to-right.
    */
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.4)),
-    url(images/gaillardia-grandiflora.jpg);
+    linear-gradient(rgb(255 255 255 / 40%), rgb(255 255 255 / 40%)),
+    url("images/gaillardia-grandiflora.jpg");
   background-size: cover, 60%;
 }
 
