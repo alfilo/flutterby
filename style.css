@@ -16,3 +16,9 @@
   list-style-type: none;
   padding: 0;
 }
+
+@media only screen and (max-width: 360px) {
+  #header {
+    background-image: none;
+  }
+}
