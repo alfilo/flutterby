@@ -11,6 +11,10 @@
   background-size: cover, 60%;
 }
 
+#header .sale-date-txt {
+  background-color: rgb(240 248 255 / 70%);
+}
+
 /* Replace bullet points with checkboxes */
 #filter-results {
   list-style-type: none;
